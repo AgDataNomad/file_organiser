@@ -5,15 +5,21 @@ use chrono::{DateTime, Utc};
 
 
 fn main() {
-    let root_path = "B:/"; // Replace with your actual directory path
+    let root_path = "A:/"; // Replace with your actual directory path
 
     let mut unique_folders: HashSet<String> = HashSet::new(); // Use HashSet<String> for folder paths
 
     // Recursively walk the directory and collect unique folder paths (excluding root)
-    for entry in WalkDir::new(root_path).min_depth(1).follow_links(true) {
+    for entry in WalkDir::new(root_path)
+        .min_depth(1)
+        .max_depth(5)
+        .follow_links(true) {
         if let Ok(entry) = entry {
             if entry.file_type().is_dir() {
-                unique_folders.insert(entry.path().to_string_lossy().to_string());
+                let folder_path = entry.path().to_string_lossy().to_string();
+                if !folder_path.contains(".git") {
+                    unique_folders.insert(folder_path);
+                }
             }
         }
     }
@@ -29,7 +35,7 @@ fn main() {
             if let Ok(created) = metadata.created() {
                 let datetime: DateTime<Utc> = created.into();
                 let date_only = datetime.date_naive();
-                println!("Folder: {} - Created: {:?}", folder_path, date_only);
+                println!("{} - {:?}", date_only, folder_path);
             } else {
                 println!("Folder: {} (Creation time not available)", folder_path);
             }

@@ -1,11 +1,19 @@
-use std::collections::HashSet;
-use walkdir::WalkDir;
-use std::fs::metadata; // Import the metadata function
 use chrono::{DateTime, Utc};
-
+use std::collections::HashSet;
+use std::fs::metadata; // Import the metadata function
+use std::io;
+use walkdir::WalkDir;
 
 fn main() {
-    let root_path = "A:/"; // Replace with your actual directory path
+    println!("please enter your path:");
+
+    let mut root_path = String::new();
+
+    io::stdin()
+        .read_line(&mut root_path)
+        .expect("not a vaild path"); // Replace with your actual directory path
+
+    let root_path = root_path.trim();
 
     let mut unique_folders: HashSet<String> = HashSet::new(); // Use HashSet<String> for folder paths
 
@@ -13,7 +21,8 @@ fn main() {
     for entry in WalkDir::new(root_path)
         .min_depth(1)
         .max_depth(5)
-        .follow_links(true) {
+        .follow_links(true)
+    {
         if let Ok(entry) = entry {
             if entry.file_type().is_dir() {
                 let folder_path = entry.path().to_string_lossy().to_string();
